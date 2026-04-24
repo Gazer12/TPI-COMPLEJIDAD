@@ -1,5 +1,5 @@
 import time
-import math
+from array import array  # modulo estandar, no hay que instalar nada
 
 # ---- Decorator del profe ----
 def delta_time(n):
@@ -17,31 +17,28 @@ def delta_time(n):
         return w
     return count_elapsed_time
 
-# ---- Suma de divisores propios en O(√n) ----
-def suma_divisores(n):
-    if n < 2:
-        return 0
-    total = 1
-    sqrt_n = int(math.isqrt(n))
-    for i in range(2, sqrt_n + 1):
-        if n % i == 0:
-            total += i
-            if i != n // i:
-                total += n // i
-    return total
+# ---- Criba con array nativo ----
+def criba_sumas(limite):
+    # 'l' = unsigned long, más eficiente que lista Python normal
+    sumas = array('l', [0] * (limite + 1))
+    
+    for i in range(1, limite // 2 + 1):
+        for j in range(2 * i, limite + 1, i):  # todos los multiplos de i
+            sumas[j] += i
+    
+    return sumas
 
 # ---- Función principal decorada ----
 @delta_time("Numeros Amigos")
 def numeros_amigos(limite):
+    sumas = criba_sumas(limite)
     pares = []
-    sumas = [suma_divisores(i) for i in range(limite + 1)]  # precalculo todo junto
-    
+
     for a in range(2, limite + 1):
         b = sumas[a]
-        # Condiciones: b es distinto de a, está en rango, y sumas[b] == a
-        if b != a and b > a and b <= limite and sumas[b] == a:
+        if b > a and b <= limite and sumas[b] == a:
             pares.append((a, b))
-    
+
     return pares
 
 # ---- Ejecución ----
